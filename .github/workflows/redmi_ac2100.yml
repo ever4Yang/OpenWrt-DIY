@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["${{  env.target }}"]
+        target: [ ramips_mt7621  ]
         
     steps:
     - name: Checkout
