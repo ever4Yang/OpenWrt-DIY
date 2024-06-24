@@ -173,10 +173,10 @@ jobs:
         echo "CONFIG_VERSION_REPO=\"https://dl.openwrt.ai/23.05\"">>devices/common/.config
         cp  ${GITHUB_WORKSPACE}/config/diy.sh  devices/common/diy.sh
 
-        cp -rf devices/common/. openwrt/
-        cp -rf devices/${{matrix.target}}/. openwrt/
-        cp -rf devices openwrt/
-        cd openwrt
+        cp -rf devices/common/.  ${GITHUB_WORKSPACE}/openwrt/
+        cp -rf devices/${{matrix.target}}/.  ${GITHUB_WORKSPACE}/openwrt/
+        cp -rf devices  ${GITHUB_WORKSPACE}/openwrt/
+        cd  ${GITHUB_WORKSPACE}/openwrt
         chmod +x devices/common/$DIY_SH
         /bin/bash "devices/common/$DIY_SH"
         cp -f devices/common/$CONFIG_FILE .config
