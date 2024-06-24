@@ -65,10 +65,10 @@ jobs:
       run: |
       
         echo ${{matrix.target}}
-        source "${GITHUB_WORKSPACE}/devices/common/settings.ini"
-        if [ -f "devices/${{matrix.target}}/settings.ini" ]; then
-          source "${GITHUB_WORKSPACE}/devices/${{matrix.target}}/settings.ini"
-        fi
+        # source "${GITHUB_WORKSPACE}/devices/common/settings.ini"
+        # if [ -f "devices/${{matrix.target}}/settings.ini" ]; then
+        #   source "${GITHUB_WORKSPACE}/devices/${{matrix.target}}/settings.ini"
+        # fi
         echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
         echo "REPO_BRANCH=${REPO_BRANCH}" >> $GITHUB_ENV
         echo "CONFIG_FILE=${CONFIG_FILE}" >> $GITHUB_ENV
