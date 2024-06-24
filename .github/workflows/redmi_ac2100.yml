@@ -170,7 +170,7 @@ jobs:
         cd  OpenWrt_x86-r2s-r4s-r5s-N1
         rm  devices/common/diy.sh
         echo "CONFIG_VERSION_REPO=\"https://dl.openwrt.ai/23.05\"">>devices/common/.config
-        cp  ${GITHUB_WORKSPACE}/config/diy.sh  devices/common/
+        cp  ${GITHUB_WORKSPACE}/config/diy.sh  devices/common/diy.sh
 
         cp -rf devices/common/. openwrt/
         cp -rf devices/${{matrix.target}}/. openwrt/
