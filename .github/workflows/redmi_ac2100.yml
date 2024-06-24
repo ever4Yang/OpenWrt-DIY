@@ -170,35 +170,30 @@ jobs:
         ln -sf /mnt/openwrt/staging_dir openwrt/staging_dir
         ln -sf /mnt/openwrt/build_dir openwrt/build_dir
 
-    - name: Clone source code kiddin9/OpenWrt_x86-r2s-r4s-r5s-N1
-      run: |   
-          
-        git clone https://github.com/kiddin9/OpenWrt_x86-r2s-r4s-r5s-N1  OpenWrt_x86-r2s-r4s-r5s-N1
-
-        cp OpenWrt_x86-r2s-r4s-r5s-N1/* openwrt/
-
 
 
 
 
     - name: Load custom configuration
       run: |
-        function git_clone_path() {
-          branch="$1" rurl="$2" localdir="gitemp" mv="$3"
-          [[ "$mv" != "mv" ]] && shift 2 || shift 3
-          git clone -b $branch --depth 1 --filter=blob:none --sparse $rurl $localdir
-          if [ "$?" != 0 ]; then
-            echo "error on $rurl"
-            return 0
-          fi
-          cd $localdir
-          git sparse-checkout init --cone
-          git sparse-checkout set $@
-          [[ "$mv" != "mv" ]] && cp -rn ./* ../ || mv -n $@/* ../$@/
-          cd ..
-          rm -rf gitemp
-          }
-        export -f git_clone_path
+        # function git_clone_path() {
+        #   branch="$1" rurl="$2" localdir="gitemp" mv="$3"
+        #   [[ "$mv" != "mv" ]] && shift 2 || shift 3
+        #   git clone -b $branch --depth 1 --filter=blob:none --sparse $rurl $localdir
+        #   if [ "$?" != 0 ]; then
+        #     echo "error on $rurl"
+        #     return 0
+        #   fi
+        #   cd $localdir
+        #   git sparse-checkout init --cone
+        #   git sparse-checkout set $@
+        #   [[ "$mv" != "mv" ]] && cp -rn ./* ../ || mv -n $@/* ../$@/
+        #   cd ..
+        #   rm -rf gitemp
+        #   }
+        # export -f git_clone_path
+        git clone https://github.com/kiddin9/OpenWrt_x86-r2s-r4s-r5s-N1   OpenWrt_x86-r2s-r4s-r5s-N1
+        cd  OpenWrt_x86-r2s-r4s-r5s-N1
         cp -rf devices/common/. openwrt/
         cp -rf devices/${{matrix.target}}/. openwrt/
         cp -rf devices openwrt/
@@ -272,9 +267,9 @@ jobs:
         fi
         df -hT
 
-    - name: SSH connection to Actions
-      uses: kiddin9/debugger-action@master
-      if: contains(github.event.action, 'ssh')
+    # - name: SSH connection to Actions
+    #   uses: kiddin9/debugger-action@master
+    #   if: contains(github.event.action, 'ssh')
 
     - name: Compile the firmware
       id: compile
@@ -307,18 +302,18 @@ jobs:
         echo "NOTICE=请分配不少于1G的存储容量" >> $GITHUB_ENV
         fi
 
-    - name: Deploy imagebuilder to server
-      uses: easingthemes/ssh-deploy@main
-      continue-on-error: true
-      if: env.SSH_PRIVATE_KEY && ! contains(github.event.action, 'noser')
-      with:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        ARGS: "-avzr"
-        SOURCE: openwrt/bin/targets
-        REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-        REMOTE_PORT: ${{ secrets.SERVER_PORT }}
-        REMOTE_USER: root
-        TARGET: "/www/wwwroot/dl.openwrt.ai/releases/tmp/"
+    # - name: Deploy imagebuilder to server
+    #   uses: easingthemes/ssh-deploy@main
+    #   continue-on-error: true
+    #   if: env.SSH_PRIVATE_KEY && ! contains(github.event.action, 'noser')
+    #   with:
+    #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    #     ARGS: "-avzr"
+    #     SOURCE: openwrt/bin/targets
+    #     REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+    #     REMOTE_PORT: ${{ secrets.SERVER_PORT }}
+    #     REMOTE_USER: root
+    #     TARGET: "/www/wwwroot/dl.openwrt.ai/releases/tmp/"
 
     - name: Upload firmware for artifact
       uses: actions/upload-artifact@main
@@ -351,17 +346,17 @@ jobs:
         tag_name: ${{ env.date }}_${{matrix.target}}
         body_path: release.txt
     
-    - name: WeChat notification
-      continue-on-error: true
-      if: env.SCKEY
-      run: |
-        # [ steps.compile.outputs.status == 'success' ] && curl https://sctapi.ftqq.com/${{ secrets.SCKEY }}.send?text=🎉OpenWrt_${{ env.VERSION }}_${{matrix.target}}编译完成😋|| curl https://sctapi.ftqq.com/${{ secrets.SCKEY }}.send?text=❌OpenWrt_${{ env.VERSION }}_${{matrix.target}}编译失败😂
+    # - name: WeChat notification
+    #   continue-on-error: true
+    #   if: env.SCKEY
+    #   run: |
+    #     # [ steps.compile.outputs.status == 'success' ] && curl https://sctapi.ftqq.com/${{ secrets.SCKEY }}.send?text=🎉OpenWrt_${{ env.VERSION }}_${{matrix.target}}编译完成😋|| curl https://sctapi.ftqq.com/${{ secrets.SCKEY }}.send?text=❌OpenWrt_${{ env.VERSION }}_${{matrix.target}}编译失败😂
 
-    - name: Telegram notification
-      if: env.TELEGRAM_TOKEN && ! contains(github.event.action, 'notg')
-      continue-on-error: true
-      run: |
-        curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.VERSION }} ${{matrix.target}} 编译成功 😋  https://dl.openwrt.ai/firmware/${{matrix.target}}/  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
+    # - name: Telegram notification
+    #   if: env.TELEGRAM_TOKEN && ! contains(github.event.action, 'notg')
+    #   continue-on-error: true
+    #   run: |
+    #     curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.VERSION }} ${{matrix.target}} 编译成功 😋  https://dl.openwrt.ai/firmware/${{matrix.target}}/  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
