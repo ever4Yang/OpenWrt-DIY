@@ -32,7 +32,8 @@ env:
   target : ramips_mt7621  
   REPO_URL: https://github.com/openwrt/openwrt
   REPO_BRANCH : openwrt-23.05
-
+  DIY_SH : diy.sh
+  CONFIG_FILE : .config
 jobs:
   build:
     runs-on: Ubuntu-22.04
